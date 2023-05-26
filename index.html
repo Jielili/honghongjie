@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.2/dist/echarts.min.js"></script>
+  <title>红红姐</title>
+</head>
+<body>
+  <div id="chart"></div>
+</body>
+<style>
+  html,body{
+    padding: 0;
+    margin: 0;
+    height: 100vh;
+    width: 100vw
+  }
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  #chart {
+    height: calc(100% - 50px);
+    width: 50%;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 20px;
+    border-radius: 5px;
+  }
+</style>
+</html>
+<script src="./data.js"></script>
+<script type="module">
+let option;
+
+const xData = timeRecords.map(item => item.date)
+const yData = timeRecords.map((item,index) => {
+  // return (item.time[0]*60*1000 + item.time[1]*1000 + item.time[2]*10) / 60 / 1000
+  // return item.time[0] + '.' + item.time[1] + '.' + item.time[2]
+  // return item.time
+  const a = item.time.split('.').map(item => Number(item))
+  // return (a[0]*60*1000 + a[1]*1000 + a[2]*10) / 60 / 1000
+  return [index, (a[0]*60*1000 + a[1]*1000 + a[2]*10) / 60 / 1000, item.time]
+})
+
+
+
+option = {
+  color: ['#5470C6', '#EE6666'],
+  title: {
+    text: 'time records of honghongjie',
+  },
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'cross'
+    },
+    formatter: (params) => {
+      const item = params[0]
+      return item.axisValue
+         + '<div style="margin-top: 5px">'
+         + item.marker + item.seriesName 
+         + '<span style="margin-left: 8px; font-weight:700;">'
+         + item.data[2] 
+         + '</span>'
+         + '</div>'
+    },
+    valueFormatter: (value) => {
+      return value.toFixed(2)
+    }
+  },
+  xAxis: {
+    type: 'category',
+    axisTick: {
+      alignWithLabel: true,
+    },
+    // name: '日期',
+    data: xData
+  },
+  yAxis: {
+    // name: '时长',
+    type: 'value',
+    axisLabel: {
+      formatter: '{value} s'
+    },
+    axisPointer: {
+      snap: true
+    }
+  },
+  series: [
+    {
+      name: '时长',
+      data: yData,
+      type: 'line',
+      markPoint: {
+        data: [
+          { 
+            type: 'max', 
+            name: 'Max',  
+            label: {
+              formatter: (params) => {
+                console.log(params)
+                return params.value.toFixed(2)
+              }
+            }
+          },
+          { 
+            type: 'min',
+            name: 'Min',
+            label: {
+              formatter: (params) => {
+                return params.value.toFixed(2)
+              }
+            }
+          }
+        ]
+      },
+      tooltip: {
+        formatter: (params) => {
+          console.log(params)
+          return params[0].data[2] 
+        },
+      }
+      
+    }
+  ]
+};
+
+const chartDom = document.getElementById('chart');
+const myChart = echarts.init(chartDom);
+option && myChart.setOption(option);
+
+window.onresize = function() {
+  myChart.resize();
+};
+</script>
