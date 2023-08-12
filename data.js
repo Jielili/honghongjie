@@ -17,6 +17,6 @@ const timeRecords = [
   },
   {
     date: '2023-08-11',
-    time: '11:05.78'
+    time: '11.05.78'
   }
 ]
